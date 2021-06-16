@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+{% set advanced = true %}
+<table>
+  <thead>
+    <tr><th>Sample</th><th>Time added</th><th># runs</th><th>%N</th><th>Ct</th><th>Collection date</th><th>Criterion</th></tr>
+  </thead>
+  {% for sample, data in samples.items() if data|length > 1 or data[0].qc.pct_N_bases|int > 10 %}
+  
+  <tr>
+    <td>
+      <a href="report/{{data[0]._id}}/5/advanced">{{data[0].sample_id}}</a>
+    </td>
+    <td>
+      {% for d in data|reverse %}
+      {% if d.qc.pct_N_bases|int < 10 %}
+      <span class="success tag">{{ d.time_added|date_notime }}</span>
+      {% else %}
+      <span class="fail tag">{{ d.time_added|date_notime }}</span>
+      {% endif %}				   
+      {% endfor %}
+    </td>
+    <td>
+      {{data|length}}
+    </td>
+
+    <td>
+    {% for d in data|reverse %}
+      {% if d.qc.pct_N_bases|int < 10 %}
+        <span class="success tag">
+      {% else %}
+        <span class="fail tag">
+	{% endif %}
+	{{ "%.1f"|format(d.qc.pct_N_bases) }}%</span>
+    {% endfor %}
+    </td>
+
+    <td>
+    {% for d in data|reverse %}
+      {% if "Ct" in d %}
+        {% if d.Ct == "Undetermined" %}
+          <span class="fail tag">Undet</span>
+        {% elif d.Ct|int > 30 %}
+          <span class="warn tag">{{ "%.1f"|format(d.Ct|float) }}</span>
+	{% else %}
+	  <span class="success tag">{{ "%.1f"|format(d.Ct|float) }}</span>
+	{% endif %}
+      {% else %}  
+        <span class="missing tag">N/A</span>
+      {% endif %}	  
+    {% endfor %}
+    </td>
+
+    <td>{{ data[0].collection_date|date_notime }}</td>
+    <td>{{ data[0].selection_criterion|safe }}</td>
+
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

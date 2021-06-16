@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block body %}
+{% set advanced = true if verbosity=="advanced" else false %}
+{%if advanced %}Showing {{samples|count}} unique samples<br><br>{% endif %}
+<form action="{{ url_for('index', verbosity=verbosity) }}">
+  <input type="hidden" id="verbosity" name="verbosity" value="{{verbosity}}">
+  <div id="search">Search:  <input type="text" id="search_string" name="search_string" value="{{search_string}}"></div>
+</form>
+<table>
+  <thead>
+    <tr><th>Time added</th><th>Sample</th><th>QC</th><th>Pangolin</th><th>Significant variants</th><th>Coll. date</th>{% if advanced %}<th>Ct</th><th>%N</th><th>mapped reads</th><th>Sequencing run</th><th>Sex</th><th>Age</th><th>MLU</th><th>Orig. lab</th><th>Seq. lab</th>{% endif %}<th>Criterion</th></tr>
+  </thead>
+  {% for sample in samples %}
+  <tr>
+    <td>
+      {{ sample.time_added|human_date }}
+    </td>
+    <td>
+      <a href="report/{{sample._id}}/5/{{verbosity}}">{{sample.sample_id}}</a>
+    </td>
+
+    {% if sample.qc.pct_N_bases|int < 10 %}
+      <td>OK</td>
+      {% if sample.pangolin.type in lineages_of_concern %}				      
+      <td><span class="info"><a href="{{ url_for('pangolin', pango_type=sample.pangolin.type) }}">{{sample.pangolin.type}}</a></span></td>
+      {% else %}
+      <td><a href="{{ url_for('pangolin', pango_type=sample.pangolin.type) }}">{{sample.pangolin.type}}</a></td>
+      {% endif %}
+    {% else %}
+    <td><span class="fail tag">FAIL</span></td><td>-</td>
+    {% endif %}
+    <td>
+      {% for v in sample.significant_variants %}
+      <span class="variant tag"><a href="{{ url_for('variant', var_id=v.id) }}">{{v.aa}}</a></span>&nbsp;
+      {% endfor %}
+    </td>
+    <td>{{ sample.collection_date|date_notime }}</td>
+    {% if advanced %}
+    <td>
+      {% if "Ct" in sample %}
+        {% if sample.Ct == "Undetermined" %}
+          <span class="fail tag">Undet</span>
+        {% elif sample.Ct|int > 30 %}
+          <span class="warn tag">{{ "%.1f"|format(sample.Ct|float) }}</span>
+        {% else %}
+          <span class="success tag">{{ "%.1f"|format(sample.Ct|float) }}</span>
+        {% endif %}
+      {% else %}
+        <span class="missing tag">N/A</span>
+      {% endif %}
+    </td>
+    <td>{{ "%.1f"|format(sample.qc.pct_N_bases) }}%</td>
+    <td>{{ sample.qc.num_aligned_reads }} ({{ sample.qc.on_target }}%)</td>
+    {% set path_parts = sample.vcf_filename.split('/') %}
+    <td>{{ path_parts[-2] }}</td>
+    <td>{{ sample.sex }}</td>
+    <td>{{ sample.age }}</td>
+    <td>{{ sample.mlu }}</td>
+    <td>{{ sample.lab }}</td>
+    <td>{{ sample.seqfacility }}</td>
+    {% endif %}
+
+    <td>{{ sample.selection_criterion|safe }}</td>
+
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

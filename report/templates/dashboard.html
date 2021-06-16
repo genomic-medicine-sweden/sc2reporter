@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block body %}
+<br>
+{% if criterion_checkboxes|length == 0 %}
+  {% set surv_checked = "checked" %}
+  {% set other_checked = "checked" %}
+  {% set vaccine_checked = "checked" %}
+  {% set travel_checked = "checked" %}
+  {% set reinfect_checked = "checked" %}
+{% else %}
+  {% set vaccine_checked = "checked" if criterion_checkboxes.vaccine == "on" else "" %}
+  {% set other_checked = "checked" if criterion_checkboxes.other == "on" else "" %}
+  {% set surv_checked = "checked" if criterion_checkboxes.surv == "on" else "" %}
+  {% set travel_checked = "checked" if criterion_checkboxes.travel == "on" else "" %}
+  {% set reinfect_checked = "checked" if criterion_checkboxes.reinfect == "on" else "" %}
+{% endif %}
+
+
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+  {% set lineages_to_include = ["B.1.1.7", "B.1.177", "B.1.177.21", "B.1.221", "B.1.160", "B.1.177.86", "B.1.351"] %}
+
+  let traces = [];
+  {% for lin in lineages_to_include %}
+    traces.push({
+      x: {{ pango_per_date|get_dates|safe }},
+      y: {{ pango_per_date|pct_type(lin) }},
+      stackgroup: 'one', name: "{{ lin }}",
+      yaxis: 'y1',
+    });
+  {% endfor %}
+
+  traces.push({
+    x: {{ pango_per_date|get_dates|safe }},
+    y: {{ pango_per_date|num_samples_per_date }},
+    yaxis: 'y2',
+    line: {color:'rgba(10,10,10,0.2)', width:2, opacity:0.1},
+    name: "# samples",
+  });
+
+  var layout = {
+    yaxis: {
+      tickformat: ',.0%',
+      range: [0,1]
+    },
+    yaxis2: {
+      title: '# samples',
+      overlaying: 'y',
+      side: 'right'
+    },
+    title: 'Most common pango types over time',
+    margin: {l:50, r:70, t:80, b:50 },
+    legend: {x:1.15}
+  }
+  
+  Plotly.newPlot('plot_div', traces, layout);
+
+  });
+
+</script>
+<div>
+<div class="flex-container">
+  <div>
+    <h2>General stats</h2>
+    <table>
+      <thead>
+	<tr><th></th><th></th></tr>
+      </thead>
+      <tr>
+	<td>Total samples with passed QC</td><td>{{ samples.count() }} (<a href="{{ url_for('create_tree', group='all', value='All') }}">microreact</a>)</td>
+      </tr>
+      <tr>
+	<td>Total failed samples</td><td>{{failed_samples }}</td>
+      </tr>
+      <tr>
+	<td>Number of pango types detect</td><td>{{pango_total_counts.keys()|count}}</td>
+      </tr>
+      <tr>
+	<td>Number of unique mutations detect</td><td>{{variants.count()}}</td>
+      </tr>
+    </table>
+    
+</div>
+  
+  <div>
+    <div id="criterion_form">
+      <form action="#">
+      <input type="checkbox" id="surv" {{surv_checked}} name="surv"> Allmän övervakning
+      <input type="checkbox" id="vaccine" {{vaccine_checked}} name="vaccine"> Vaccingenombrott
+      <input type="checkbox" id="reinfect" {{reinfect_checked}} name="reinfect"> Reinfektion
+      <input type="checkbox" id="travel" {{travel_checked}} name="travel"> Reseanamnes
+      <input type="checkbox" id="other" {{other_checked}} name="other"> Övriga
+      <input type="submit" value="Update">
+    </form>
+    </div>
+    <div class="large-plot shadow" id="plot_div"></div>
+    <div>
+      <h3>Pango observations per week</h3>
+	<table>
+	<thead>
+	  <tr>
+	    <th>Week</th>
+	    {% for week, tot in weeks.items() %}<th>{{ week }}</th>{% endfor %}
+	    <th>Total</th>
+	  </tr>
+	</thead>
+	{% for type, counts in pango_count_per_week.items()|sort(attribute='1.Total', reverse=true) %}
+	<tr>
+	  {% if type in lineages_of_concern %}
+	  <td><span class="info"><a href="{{ url_for('pangolin', pango_type=type) }}">{{type}}</a></span></td>
+	  {% else %}
+	  <td><span class="nothing"><a href="{{ url_for('pangolin', pango_type=type) }}">{{type}}</a><span></td>
+	  {% endif %}
+	  {% for week, tot in weeks.items() %}
+	  <td>{{counts[week]}}</td>
+	  {% endfor %}
+	  <td>{{counts["Total"]}}</td>
+	</tr>
+	{% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <div></div>
+</div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+
+{% set advanced = true if verbosity=="advanced" else false %}
+{% set no_comparison = true if verbosity=="none" else false %}
+{% set qc_pass = true if sample.qc.pct_covered_bases|int > 90 else false %}
+
+{% block body %}
+{% if advanced %}
+<a href="/report/{{sample._id}}/5/simple"><div style="float:right; width:30px; height: 30px; border:0;"></div></a>
+{% else %}
+<a href="/report/{{sample._id}}/5/advanced"><div style="float:right; width:30px; height: 30px; border:0;"></div></a>
+{% endif %}
+<h1>Report for {{sample["sample_id"]}}</h1>
+
+{% if advanced and replicates.count() > 1 %}
+<div class="replicates">
+  <h3>Replicates</h3>
+<!--This sample has been sequenced {{replicates.count()}} times-->
+<table>
+  <thead>
+    <tr><th>Time added</th><th>QC: %N</th><th>Pango</th><th>status</th><th>currently shown</th></tr>
+  </thead>
+  {% for rep in replicates %}
+<tr>
+  <td><a href="/report/{{rep._id}}/5/advanced">{{rep.time_added|human_date }}</a></td>
+  <td>{{ rep.qc.pct_N_bases}}</td>
+  <td><a href="{{ url_for('pangolin', pango_type=rep.pangolin.type) }}">{{rep.pangolin.type}}</a></td>
+  <td>{%if rep.hidden %}hidden{% endif %}</td>
+  <td>{%if rep._id == sample._id %}yes{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+<br><br>
+{% endif %}
+
+<h3>General results</h3>
+<table>
+  <thead>
+    <tr><th></th><th></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Sample ID</b></td> <td>{{sample.sample_id}}</td>
+    </tr>
+    {% if qc_pass or advanced %}
+    <tr>
+      <td><b>Pango type</b></td> <td><a href="{{ url_for('pangolin', pango_type=sample.pangolin.type) }}">{{sample.pangolin.type}}</a></td>
+    </tr>
+    {% for old in sample.old_pangolin %}
+    <tr style="display:none;">
+      <td><b>Earlier pango type</b></td> <td>{{old.type}} ({{old.pangolearn_version}})</a></td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td><b>Nextstrain clade</b></td> <td><a href="{{ url_for('nextstrain', clade=sample.nextclade|replace('/','_')) }}">{{sample.nextclade}}</a></td>
+    </tr>
+    <tr>
+      <td><b># detected variants</b></td>
+      <td>
+	{{sample.variants|length}}
+      </td>
+    </tr>
+    {% endif %}
+  
+    <tr>
+      <td><b>QC</b></td>
+      {% if qc_pass %}
+      <td>PASS</td>
+      {% else %}
+      <td><span class="fail">FAIL</span> ({{sample.qc.pct_N_bases}}% missing)</td>
+      {%endif%}
+    </tr>
+  </tbody>
+
+</table>
+
+{% if qc_pass or advanced %}
+<h3>Detected variants</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Variant</th>
+      <th>Gene</th>
+      <th>Consequence</th>
+      <th>cDNA change</th>
+      <th>AA change</th>
+      <th>Var frequency</th>
+      <th>Seq depth</th>
+      <th>Local occurrences</th>
+    </tr>
+  </thead>
+  {% for var in sample.variants %}
+    {% set anno = variant_annotation[var.id] %}
+    <tr {% if anno.significant %} class="info" {% elif anno.significant_position %} class="info" {% endif %} {% if anno.csq.IMPACT not in ["MODERATE","HIGH"] %} class="unknown"{% endif %}>
+      <td><a href="{{ url_for('variant', var_id=var.id) }}">{{var.id | replace('_',' ')}}</a></td>
+      <td>{{ anno.csq.SYMBOL }}</td>
+      <td>{{ anno.csq.Consequence|join(", ") }}</td>
+      <td>{{ anno.csq.HGVSc|no_transid|unesc }}</td>
+      <td>{{ anno.csq.HGVSp|no_transid|one_letter_p|unesc }}</td>
+      <td class="right">{{ "%.1f"|format(100*var.alt_freq|float) }}%</td>
+      <td class="right">{{ "%.0f"|format(var.dp) }}</td>
+      <td class="right">{{1+sample_counts[var.id]}}/{{tot_samples}}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+
+<h3>QC details</h3>
+<table>
+  <thead>
+    <tr><th>Metric</th><th>Value</th></tr>
+  </thead>
+  <tr>
+    <td><b># aligned reads</b></td> <td>{{sample.qc.num_aligned_reads}}</td>
+  </tr>
+  <tr>
+    <td><b>% reads on target</b></td> <td>{{sample.qc.on_target}}%</td>
+  </tr>
+  <tr>
+    <td><b>% covered inn consensus sequence</b></td> <td>{{sample.qc.pct_covered_bases}}%</td>
+  </tr>
+  <tr>
+    <td><b>% missing in consensus sequence</b></td> <td>{{sample.qc.pct_N_bases}}%</td>
+  </tr>
+</table>
+{% if (qc_pass or advanced) and not no_comparison %}
+{% if variant_data|length > 1 %}
+<h3>Variants of all similar samples (max {{max_diff}} differences)</h3>
+<table>
+  <tr>
+    <thead>
+      <th>Sample</th>
+      {% if advanced %}
+      <th>Coll. date</th>
+      {% endif %}
+      <th>Pango</th>
+      <th># diffs</th>
+      {% for var in variants|pos_sort %}
+      <th>{{var|replace("_","<br>")|safe}}</th>
+      {% endfor %}
+    </thead>
+  </tr>
+  {% for sample_id, data in variant_data.items() %}
+  <tr>
+    <td><a href="{{ url_for('report', sample_id=data.sample_data._id, max_diff=max_diff, verbosity=verbosity) }}">{{ data.sample_data.sample_id }}</a></td>
+    {% if advanced %}
+    <td>{{ data.sample_data.collection_date|date_notime }}</td>
+    {% endif %}
+    <td>{{ data.sample_data.pangolin.type }}</td>
+    <td>{% if data.sample_data.n_diff >= 0 %} {{ data.sample_data.n_diff }} {% endif %}</td>
+    {% for variant_id in data.variants.keys()|pos_sort %}
+
+    {% set status = data.variants[variant_id]["status"] %}
+    {% set var_parts = variant_id.split('_') %}
+    {% set bases = var_parts[1].split('>') %}
+
+    {% set del = true if bases[0]|length > bases[1]|length %}
+    {% set ins = true if bases[0]|length < bases[1]|length %}
+    {% set dp_base = "DEL" if del else "REFSKIP" if ins else bases[1][0] %}
+    {% set dp_pos = (var_parts[0]|int + 1) if del or ins else var_parts[0]|int %}
+    {% set dp =  depth[sample_id][dp_pos] %}
+    {% set dpdp =  dp.dp if "dp" in dp else -2 %}
+    {% set dp_pos_base = dp[dp_base] if dp_base in dp else 0 %}
+    {% set vaf = 100*dp_pos_base/(dpdp+1) %}
+
+					   
+    {% set dp_str = "%.1f%%<br>(%d/%d)"|format(vaf, dp_pos_base, dpdp)|safe %}
+
+    {% if status == "match" %}
+    <td class="ok">{% if advanced %}{{dp_str }}{% else %}X{% endif %}</td>
+    {% elif status == "additional" %}
+    <td class="warning">{% if advanced %}{{ dp_str}}{% else %}X{% endif %}</td>
+    {% elif dpdp < 10 %}
+    <td class="nodata">{{ dp_pos_base }}/{{ dpdp }}</td>
+    {% else %}
+      {% if vaf > 5 %}
+        <td class="lowfreq">{% if advanced %}{{ dp_str }}{% else %}{{ "%.1f%%"|format(vaf) }}{% endif %}</td>
+      {% else %}
+        <td class="missing">{% if advanced %}{{ dp_str }}{% endif %}</td>
+      {% endif %}
+    {% endif %}
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<br>No similar samples were found
+{% endif %}
+{% endif %}
+{#{variant_annotation}#}
+
+{% endblock %}
+

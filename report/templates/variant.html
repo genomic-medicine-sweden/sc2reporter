@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+  variant_data = {
+  x: {{ var_per_date|get_dates|safe }},
+  y: {{ var_per_date|pct_type(var_id) }},
+  name: "{{ var_id }}",
+  type:'scatter'
+  };
+
+
+  var layout = {
+    yaxis: {
+      tickformat: ',.0%',
+      range: [0,1.01]
+    },
+    margin: {l:50, r:30, t:60, b:50},
+    title: 'Variant frequency over time'
+  }
+
+  Plotly.newPlot('plot_div', [variant_data], layout);
+
+  });
+
+</script>
+
+
+<h1>Mutation report for {{var_id}}</h1>
+<h3>Mutation details</h3>
+<table>
+  <thead>
+    <tr><th></th><th></th></tr>
+  </thead>
+  <tr>
+    <td><b>Genomic change</b></td><td>{{annotations._id}}</td>
+  </tr>
+  <tr>
+    <td><b>Gene</b></td><td>{{annotations.csq.SYMBOL}}</td>
+  </tr>
+  <tr>
+    <td><b>cDNA change</b></td><td>{{annotations.csq.HGVSc|no_transid}}</td>
+  </tr>
+  <tr>
+    <td><b>Protein change</b></td><td>{{annotations.csq.HGVSp|no_transid|one_letter_p|unesc}}</td>
+  </tr>
+  <tr>
+    <td><b>Codon change</b></td><td>{{annotations.csq.Codons}}</td>
+  </tr>
+  <tr>
+    <td><b>Consequence</b></td><td>{{annotations.csq.Consequence|join(", ")}}</td>
+  </tr>
+  <tr>
+    <td><b>Exernal link: CoVariants</b></td><td>{{ (annotations.csq.SYMBOL ~':'~ annotations.csq.HGVSp|no_transid|one_letter_p|unesc)|variant_link|safe}}</td>
+  </tr>
+</table>
+<div class="shadow small-plot" id="plot_div"></div>
+<h3>Samples with mutation</h3>
+<form action="{{ url_for('variant', var_id=var_id) }}">
+  <div id="search">Search:  <input type="text" id="search_string" name="search_string" value="{{search_string}}"></div>
+</form>
+<table>
+  <thead>
+    <tr><th>Sample</th><th>Collection date</th><th>Pango</th><th>Date added</th></tr>
+  </thead>
+{% for sample in samples %}
+<tr>
+  <td><a href="{{ url_for("report", sample_id=sample._id, max_diff=5, verbosity="simple") }}">{{sample.sample_id}}</a></td>
+  <td>{{sample.collection_date|date_notime }}</td>
+  <td><a href="{{ url_for('pangolin', pango_type=sample.pangolin.type) }}">{{sample.pangolin.type}}</a></td>
+  <td>{{sample.time_added|date_notime }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+

@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Nextstrain report for {{clade}}</h1>
+
+<h3>Nextstrain clade info</h3>
+<table>
+  <thead>
+    <tr><th></th><th></th></tr>
+  </thead>
+  <tr><td><b>Clade name</b></td><td>{{clade}}</td></tr>
+  <tr><td><b>Number of samples</b></td><td>{{samples.count()}}</td></tr>
+</table>
+
+<br><a href="/createtree/nextstrain/{{clade|replace('/','_')}}" target="_blank"><button>Show tree in Microreact</button></a>
+    
+<h3>Samples of clade</h3>
+<table>
+  <thead>
+    <tr><th>Sample</th><th>Collection date</th><th>Nextstrain clade</th><th>Pango type</th><th>Date added</th></tr>
+  </thead>
+{% for sample in samples %}
+<tr>
+  <td><a href="{{ url_for("report", sample_id=sample._id, max_diff=5, verbosity="simple") }}">{{sample.sample_id}}</a></td>
+  <td>{{sample.collection_date|date_notime }}</td>
+  <td>{{sample.nextclade }}</td>
+  <td>{{sample.pangolin.type }}</td>
+  <td>{{sample.time_added|date_notime }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+

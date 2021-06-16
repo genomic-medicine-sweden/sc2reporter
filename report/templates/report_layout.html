@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+  <title>Sars-Cov-2</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+{% block body %}{% endblock %}
+
+</body>
+</html>

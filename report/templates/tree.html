@@ -1,0 +1,12 @@
+{% extends "report_layout.html" %}
+
+{% block body %}
+{{tree}}
+
+<p>
+  {{response}}<br><br>
+  {{response.content}}<br><br>
+  <pre>{{response.request.body|pretty}}</pre><br><br>
+</p>
+{% endblock %}
+

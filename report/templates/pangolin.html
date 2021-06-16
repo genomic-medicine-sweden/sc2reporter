@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+  variant_data = {
+  x: {{ pango_per_date|get_dates|safe }},
+  y: {{ pango_per_date|pct_type(pangotype) }},
+  name: "{{ pangotype }}",
+  type:'scatter'
+  };
+
+
+  var layout = {
+  yaxis: {
+  tickformat: ',.0%',
+  range: [0,1.01]
+  },
+  margin: {l:50, r:30, t:60, b:50},
+  title: 'Pango type over time'
+  }
+
+  Plotly.newPlot('plot_div', [variant_data], layout);
+
+  });
+
+</script>
+
+
+
+<h1>Pangolin report for {{pangotype}}</h1>
+
+<h3>Pango type info</h3>
+<table>
+  <thead>
+    <tr><th></th><th></th></tr>
+  </thead>
+  <tr><td><b>Type</b></td><td>{{pangotype}}</td></tr>
+  <tr><td><b>Lineage information:</b></td><td><a href="https://cov-lineages.org/lineages/lineage_{{pangotype}}.html">link</a></td></tr>
+
+  {% if pangotype in lineages_of_concern %}
+  <tr><td><b>Global report</b></td><td><a href="https://cov-lineages.org/global_report_{{pangotype}}.html">link</a></td></tr>
+  {% else %}
+  {% endif %}
+  </tr>
+</table>
+
+<br><a href="/createtree/pango/{{pangotype}}" target="_blank"><button>Show tree in Microreact</button></a>
+
+<div class="shadow small-plot" id="plot_div"></div>
+<br>
+<h3>Samples with type</h3>
+<form action="{{ url_for('pangolin', pango_type=pangotype) }}">
+  <div id="search">Search:  <input type="text" id="search_string" name="search_string" value="{{search_string}}"></div>
+</form>
+<table>
+  <thead>
+    <tr><th>Sample</th><th>Collection date</th><th>Pango type</th><th>Nextstrain clade</th><th>Significant mutations</th><th>Date added</th></tr>
+  </thead>
+  <tbody>
+  {% for sample in samples %}
+<tr>
+  <td><a href="{{ url_for("report", sample_id=sample._id, max_diff=5, verbosity="simple") }}">{{sample.sample_id}}</a></td>
+  <td>{{sample.collection_date|date_notime }}</td>
+  <td>{{sample.pangolin.type }}</td>
+  <td>{{sample.nextclade }}</td>
+  <td>
+    {% for v in sample.significant_variants %}
+    <span class="variant tag"><a href="{{ url_for('variant', var_id=v.id) }}">{{v.aa}}</a></span>&nbsp;
+    {% endfor %}
+  </td>
+  <td>{{sample.time_added|date_notime }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
+

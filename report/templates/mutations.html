@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Mutations summary</h1>
+
+{% for pos, data in summary.items() %}
+{% for change,samples in data.items() %}
+{{pos}} {{change}} {{samples|length}}<br>
+{% endfor %}
+{% endfor %}
+{% endblock %}
+
