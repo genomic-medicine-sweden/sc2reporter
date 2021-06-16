@@ -4,15 +4,12 @@ WTF_CSRF_ENABLED = True
 SECRET_KEY = 'frusklimuna4satass5h5'
 
 QC_MAX_PCT_N = 10
-DB_NAME = 'sarscov2_dev'
+DB_NAME = 'sarscov2'
 DATABASE = MongoClient()[DB_NAME]
 SAMPLE_COLL = DATABASE.sample
 VARIANT_COLL = DATABASE.variant
 DEPTH_COLL = DATABASE.depth
-
-USER_DB_NAME = 'coyote'
-USER_DATABASE = MongoClient()[USER_DB_NAME]
-USERS_COLL = USER_DATABASE.users
+USERS_COLL = DATABASE.users
 
 DEBUG = True
 
