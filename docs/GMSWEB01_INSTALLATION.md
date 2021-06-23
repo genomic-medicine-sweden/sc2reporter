@@ -1,24 +1,24 @@
 # SC2REPORTER CONFIG
 
-This is more or less just a log of what I did to install sc2reporter on the GMSWEB01 virtual machine.
+This is more or less just a log of what I did to install sc2reporter on the GMSWEB01 virtual machine. Lines starting with # are run as superuser.
 
-# Preparatory setup
+## Preparatory setup
 
-## Install some basic requirements
+### Install some basic requirements
 ```
 # dnf groupinstall "Development Tools"
 # dnf install git python38-mod_wsgi python38-devel perl-App-cpanminus
 # cpanm MongoDB
 ```
 
-## Install and enable apache
+### Install and enable apache
 ```
 # dnf install httpd
 # systemctl enable httpd
 # systemctl start httpd
 ```
 
-## Open firewall
+### Open firewall
 ```
 # firewall-cmd --zone=public --permanent --add-service=http
 # firewall-cmd --reload
@@ -93,5 +93,7 @@ $ pip install -r requirements.txt
 ```
 
 ### Add apache configuration and restart apache
+```
 $ sudo cp sc2reporter.conf /etc/httpd/conf.d/
 $ sudo apachectl restart
+```
