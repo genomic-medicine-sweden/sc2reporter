@@ -1,10 +1,9 @@
 div#pageheader {
     width: 100%;
-    float:left;
     background-color:#358;
     border-bottom: 3px solid #79b;
     margin-bottom:25px;
-    height:43px;
+    height:50px;
 }
 
 div.logo {
@@ -23,17 +22,38 @@ span.logo a {
     text-shadow: 2px 2px 9px #bdf;
 }
 
-div#login {
-    float:right;
+#login {
     font-size: 12px;
-    padding:20px;
-    color:#eee;
+    padding-right: 20px;
+    float: right;
+    color: #eee;
 }
-
-
 
 a {
     color: #44b;
+}
+
+.btn {
+    background-color: #cde;
+    padding: 5px 10px;
+    margin: 10px;
+    border-radius: 3px;
+    color: #444; 
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #bdf;
+}
+
+.nav ul {
+    list-style-type: none;
+    padding: 12px 0 0 0;
+    margin: 0;
+}
+
+.nav-li {
+    display: inline;
 }
 
 a.login {

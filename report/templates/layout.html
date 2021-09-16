@@ -14,24 +14,33 @@
 <div id='pageheader'>
   <div class='logo'>
     <span class="logo">
-      <a href="{{ url_for('index') }}">
-	SARS-CoV-2 reporter
-      </a>
+      <a href="{{ url_for('index') }}">SARS-CoV-2 reporter</a>
     </span>
   </div>
-  <div id='login'>
-    {% if current_user.is_authenticated %}
-      Logged in as {{ current_user.get_id() }}&nbsp;
-      <span style="background:#cde; border:1px solid #589; border-radius:5px; padding:3px;">
-        <a class="login" href="{{ url_for('logout') }}">Logout</a></li>
-        {% else %}
-        <a class="login" href="{{ url_for('login') }}">Login</a></li>
-        {% endif %}
-      </span>
+  {% if current_user.is_authenticated %}
+    <div class="nav">
+      <ul>
+        <li class="nav-li" ><a class="btn" href="{{ url_for('index') }}">Home</a></li>
+        <li class="nav-li"><a class="btn" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="nav-li"><a class="btn" href="{{ url_for('reruns') }}">Reruns</a></li>
+        <li class="nav-li">
+          <span id='login'>
+            {% if current_user.is_authenticated %}
+              <span>Logged in as {{ current_user.get_id() }}&nbsp;</span>
+            {% endif %}
+            <span style="background:#cde; border:1px solid #589; border-radius:5px; padding:3px;">
+              {% if current_user.is_authenticated %}
+                <a class="login" href="{{ url_for('logout') }}">Logout</a>
+              {% else %}
+                <a class="login" href="{{ url_for('login') }}">Login</a>
+              {% endif %}
+            </span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  {% endif %}
 </div>
-</div>
-
-
 
 <div class="page">
   {% block body %}{% endblock %}
