@@ -1,0 +1,96 @@
+* Block Type = 384-Well Block
+* Calibration Background is expired  = No
+* Calibration Background performed on = 09-24-2020
+* Calibration Normalization FAM-ROX is expired = No
+* Calibration Normalization FAM-ROX performed on = 09-24-2020
+* Calibration Normalization VIC-ROX is expired = No
+* Calibration Normalization VIC-ROX performed on = 09-24-2020
+* Calibration Pure Dye FAM is expired = No
+* Calibration Pure Dye FAM performed on = 09-24-2020
+* Calibration Pure Dye NED is expired = No
+* Calibration Pure Dye NED performed on = 09-24-2020
+* Calibration Pure Dye ROX is expired = No
+* Calibration Pure Dye ROX performed on = 09-24-2020
+* Calibration Pure Dye SYBR is expired = No
+* Calibration Pure Dye SYBR performed on = 09-24-2020
+* Calibration Pure Dye TAMRA is expired = No
+* Calibration Pure Dye TAMRA performed on = 09-24-2020
+* Calibration Pure Dye VIC is expired = No
+* Calibration Pure Dye VIC performed on = 09-24-2020
+* Calibration ROI is expired  = No
+* Calibration ROI performed on = 09-24-2020
+* Calibration Uniformity is expired  = No
+* Calibration Uniformity performed on = 09-24-2020
+* Chemistry = TAQMAN
+* Date Created = 2021-03-17 14:26:40 PM CET
+* Experiment Barcode = 
+* Experiment Comment = NA
+* Experiment File Name = I:\SARS-CoV-2\NGS\qPCR körningsfiler\2021-03-17 142640.eds
+* Experiment Name = 2021-03-17 142640
+* Experiment Run End Time = 2021-03-17 16:49:49 PM CET
+* Experiment Type = Presence/Absence
+* Instrument Name = IKVL
+* Instrument Serial Number = 278870946
+* Instrument Type = QuantStudio(TM) 7 Flex System
+* Passive Reference = ROX
+* Quantification Cycle Method = Ct
+* Signal Smoothing On = true
+* Stage/ Cycle where Analysis is performed = Stage 3, Step 2
+* User Name = NA
+
+[Results]
+Sample Name	Target Name	CT	NOAMP	EXPFAIL
+sc2-1001	SARS-2-Screening	34.458	N	N
+sc2-1017	SARS-2-Screening	20.819	N	N
+sc2-1035	SARS-2-Screening	21.382	N	N
+sc2-1051	SARS-2-Screening	16.620	N	N
+sc2-1009	SARS-2-Screening	33.937	N	N
+sc2-1026	SARS-2-Screening	23.239	N	N
+sc2-1043	SARS-2-Screening	16.074	N	N
+sc2-1002	SARS-2-Screening	Undetermined	Y	Y
+sc2-1019	SARS-2-Screening	31.357	N	N
+sc2-1036	SARS-2-Screening	23.331	N	N
+sc2-1052	SARS-2-Screening	26.921	N	N
+sc2-1010	SARS-2-Screening	29.843	N	N
+sc2-1027	SARS-2-Screening	22.212	N	N
+sc2-1044	SARS-2-Screening	16.051	N	N
+sc2-1003	SARS-2-Screening	34.779	N	N
+sc2-1020	SARS-2-Screening	33.220	N	N
+sc2-1037	SARS-2-Screening	20.702	N	N
+sc2-1053	SARS-2-Screening	26.307	N	N
+sc2-1011	SARS-2-Screening	24.367	N	N
+sc2-1028	SARS-2-Screening	25.035	N	N
+sc2-1045	SARS-2-Screening	17.473	N	N
+sc2-1004	SARS-2-Screening	Undetermined	Y	Y
+sc2-1021	SARS-2-Screening	26.767	N	N
+sc2-1038	SARS-2-Screening	18.984	N	N
+sc2-1054	SARS-2-Screening	30.878	N	N
+sc2-1012	SARS-2-Screening	26.511	N	N
+sc2-1029	SARS-2-Screening	16.383	N	N
+sc2-1046	SARS-2-Screening	16.714	N	N
+sc2-1005	SARS-2-Screening	34.332	N	N
+sc2-1022	SARS-2-Screening	28.488	N	N
+sc2-1039	SARS-2-Screening	25.607	N	N
+sc2-1055	SARS-2-Screening	16.824	N	N
+sc2-1013	SARS-2-Screening	31.902	N	N
+sc2-1030	SARS-2-Screening	18.836	N	N
+sc2-1047	SARS-2-Screening	14.792	N	N
+sc2-1006	SARS-2-Screening	31.353	N	N
+sc2-1023	SARS-2-Screening	18.885	N	N
+sc2-1040	SARS-2-Screening	33.245	N	N
+sc2-1014	SARS-2-Screening	25.709	N	N
+sc2-1031	SARS-2-Screening	19.320	N	N
+sc2-1048	SARS-2-Screening	14.922	N	N
+sc2-1007	SARS-2-Screening	Undetermined	Y	Y
+sc2-1024	SARS-2-Screening	28.515	N	N
+sc2-1041	SARS-2-Screening	15.895	N	N
+sc2-1015	SARS-2-Screening	33.733	N	N
+sc2-1032	SARS-2-Screening	30.089	N	N
+sc2-1049	SARS-2-Screening	15.862	N	N
+sc2-NTC	SARS-2-Screening	Undetermined	N	N
+sc2-1008	SARS-2-Screening	25.859	N	N
+sc2-1025	SARS-2-Screening	22.229	N	N
+sc2-1042	SARS-2-Screening	23.542	N	N
+sc2-1016	SARS-2-Screening	24.225	N	N
+sc2-1034	SARS-2-Screening	20.445	N	N
+sc2-1050	SARS-2-Screening	22.104	N	N
